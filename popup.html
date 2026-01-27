@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>PassPro Autofill</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+
+  <!-- Lock Screen -->
+  <div id="lockScreen" class="lock-screen hidden">
+    <h2>Enter PIN Lock</h2>
+    <input type="password" id="masterInput" placeholder="Enter PIN Lock" class="master-input"><br><br>
+    <button id="unlockBtn" class="btn">Unlock</button>
+    <p id="lockStatus" class="status"></p>
+  </div>
+
+  <!-- Main Content -->
+  <div id="mainContent" class="hidden">
+    <div class="container">
+
+      <img src="icon.png" class="logo">
+
+      <h2>PassPro Autofill</h2>
+
+      <div class="section">
+        <label class="label">Load PassPro File</label>
+
+        <input type="file" id="fileInput" class="hidden-file">
+        <button id="chooseFileBtn" class="btn">Choose File</button>
+        <button id="loadBtn" class="btn secondary">Load Data</button>
+      </div>
+
+      <div class="section">
+        <label class="label">Accounts for this site</label>
+        <div id="accountList" class="account-list"></div>
+      </div>
+
+      <button id="viewAllBtn" class="btn secondary">View All Passwords</button>
+
+      <div id="allPasswordsPanel" class="all-passwords hidden">
+        <input type="text" id="searchInput" placeholder="Search..." class="search-box">
+        <div id="allPasswordsList"></div>
+      </div>
+
+      <div class="section settings">
+        <h3>Settings</h3>
+        <p>Version: <span id="version"></span></p>
+        <p>Website: <a href="https://stadiastudios.github.io/passpro" target="_blank">stadiastudios.github.io/passpro</a></p>
+      </div>
+
+      <p id="status" class="status"></p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

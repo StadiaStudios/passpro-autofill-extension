@@ -1,0 +1,222 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #121212;
+  color: #e5e5e5;
+  font-family: Arial, sans-serif;
+  width: 300px;
+}
+
+.container {
+  padding: 15px;
+}
+
+.logo {
+  display: block;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 15px auto;
+  border-radius: 10px;
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 20px;
+  text-align: center;
+  color: #ffffff;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #bbbbbb;
+}
+
+.hidden-file {
+  display: none;
+}
+
+.btn {
+  width: 100%;
+  padding: 10px;
+  background: #222;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+  margin-bottom: 8px;
+}
+
+.btn:hover {
+  background: #b1271c;
+}
+
+.btn.secondary {
+  background: #222;
+}
+
+.btn.secondary:hover {
+  background: #b1271c;
+}
+
+.account-list button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 8px;
+  background: #222;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.account-list button:hover {
+  background: #333;
+}
+
+.all-passwords {
+  margin-top: 10px;
+  padding: 10px;
+  background: #1a1a1a;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.hidden {
+  display: none;
+}
+
+.search-box {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  background: #0f0f0f;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3;
+}
+
+.account-item {
+  padding: 8px;
+  background: #111;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  color: #e6edf3;
+}
+
+.settings {
+  border-top: 1px solid #30363d;
+  padding-top: 10px;
+}
+
+.settings h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #ffffff;
+}
+
+.settings a {
+  color: #58a6ff;
+  text-decoration: none;
+}
+
+.settings a:hover {
+  text-decoration: underline;
+}
+
+.status {
+  margin-top: 10px;
+  font-size: 13px;
+  text-align: center;
+  color: #9ba3b4;
+}
+
+/* Lock screen */
+.lock-screen {
+  text-align: center;
+  padding: 20px;
+}
+
+.master-input {
+  width: 90%;
+  padding: 10px;
+  margin-top: 10px;
+  background: #0f0f0f;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3;
+}
+
+/* Password visibility styles */
+.password-hidden {
+  color: transparent;
+  text-shadow: 0 0 8px #888;
+  user-select: none;
+  margin-top: 5px;
+}
+
+.password-visible {
+  color: #e6edf3;
+  margin-top: 5px;
+}
+
+.view-btn {
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: #111;
+  border: 1px solid #3c444c;
+  border-radius: 6px;
+  color: #e6edf3;
+  cursor: pointer;
+  font-size: 12px;
+  transition: 0.2s;
+}
+
+.view-btn:hover {
+  background: #222;
+}
+
+.account-label {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+/* Custom scrollbars */
+body::-webkit-scrollbar,
+.all-passwords::-webkit-scrollbar,
+.account-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+body::-webkit-scrollbar-track,
+.all-passwords::-webkit-scrollbar-track,
+.account-list::-webkit-scrollbar-track {
+  background: #0d0d0d;
+  border-radius: 10px;
+}
+
+body::-webkit-scrollbar-thumb,
+.all-passwords::-webkit-scrollbar-thumb,
+.account-list::-webkit-scrollbar-thumb {
+  background: #3a3f44;
+  border-radius: 10px;
+  border: 2px solid #0d0d0d;
+}
+
+body::-webkit-scrollbar-thumb:hover,
+.all-passwords::-webkit-scrollbar-thumb:hover,
+.account-list::-webkit-scrollbar-thumb:hover {
+  background: #4a4f55;
+}
