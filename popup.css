@@ -89,7 +89,7 @@ h2 {
   background: #1a1a1a;
   border: 1px solid #30363d;
   border-radius: 6px;
-  max-height: 200px;
+  max-height: 250px;
   overflow-y: auto;
 }
 
@@ -105,14 +105,15 @@ h2 {
   border: 1px solid #30363d;
   border-radius: 6px;
   color: #e6edf3;
+  box-sizing: border-box;
 }
 
 .account-item {
-  padding: 8px;
+  padding: 10px;
   background: #111;
   border: 1px solid #30363d;
   border-radius: 6px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   color: #e6edf3;
 }
 
@@ -159,20 +160,39 @@ h2 {
   color: #e6edf3;
 }
 
-/* Password visibility styles */
+/* Password & Notes Visibility */
 .password-hidden {
   color: transparent;
   text-shadow: 0 0 8px #888;
   user-select: none;
   margin-top: 5px;
+  font-family: monospace;
 }
 
 .password-visible {
   color: #e6edf3;
   margin-top: 5px;
+  font-family: monospace;
+  word-break: break-all;
 }
 
-.view-btn {
+.notes-container {
+  display: none;
+  margin-top: 8px;
+  padding: 8px;
+  background: #1c1c1c;
+  border-left: 2px solid #ff6969;
+  border-radius: 0 4px 4px 0;
+  font-size: 12px;
+  color: #bbbbbb;
+  white-space: pre-wrap; /* Preserves line breaks for recovery keys */
+}
+
+.notes-container.visible {
+  display: block;
+}
+
+.view-btn, .view-notes-btn {
   margin-top: 8px;
   padding: 6px 10px;
   background: #111;
@@ -180,17 +200,25 @@ h2 {
   border-radius: 6px;
   color: #e6edf3;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 11px;
   transition: 0.2s;
+  margin-right: 5px;
 }
 
-.view-btn:hover {
+.view-notes-btn {
+  color: #ff6969;
+}
+
+.view-btn:hover, .view-notes-btn:hover {
   background: #222;
+  border-color: #555;
 }
 
 .account-label {
   font-weight: bold;
   margin-bottom: 4px;
+  font-size: 13px;
+  color: #fff;
 }
 
 /* Custom scrollbars */
@@ -213,10 +241,4 @@ body::-webkit-scrollbar-thumb,
   background: #3a3f44;
   border-radius: 10px;
   border: 2px solid #0d0d0d;
-}
-
-body::-webkit-scrollbar-thumb:hover,
-.all-passwords::-webkit-scrollbar-thumb:hover,
-.account-list::-webkit-scrollbar-thumb:hover {
-  background: #4a4f55;
 }

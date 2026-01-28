@@ -15,7 +15,6 @@ document.getElementById("loadBtn").addEventListener("click", () => {
   reader.onload = () => {
     chrome.storage.local.set({ passproData: reader.result }, () => {
       document.getElementById("status").textContent = "PassPro data loaded.";
-      // After loading new data, re-check lock and accounts
       checkMasterLock(true);
     });
   };
@@ -23,7 +22,6 @@ document.getElementById("loadBtn").addEventListener("click", () => {
   reader.readAsText(file);
 });
 
-// Extract domain
 function getDomain(url) {
   try {
     return new URL(url).hostname.replace("www.", "");
@@ -32,9 +30,9 @@ function getDomain(url) {
   }
 }
 
-// Load accounts for current site
 function loadAccountsForSite() {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (!tabs[0]?.url) return;
     const domain = getDomain(tabs[0].url);
 
     chrome.storage.local.get("passproData", (result) => {
@@ -54,14 +52,14 @@ function loadAccountsForSite() {
       const entries = data.passwords || [];
       const matches = entries.filter(entry => {
         const entryDomain = getDomain(entry.url);
-        return entryDomain && entryDomain.includes(domain);
+        return entryDomain && domain && entryDomain.includes(domain);
       });
 
       const list = document.getElementById("accountList");
       list.innerHTML = "";
 
       if (matches.length === 0) {
-        list.innerHTML = "<p>No accounts found for this site.</p>";
+        list.innerHTML = "<p style='font-size:12px; color:#888;'>No accounts found for this site.</p>";
         return;
       }
 
@@ -81,9 +79,7 @@ function loadAccountsForSite() {
             },
             (response) => {
               document.getElementById("status").textContent =
-                response?.status === "filled"
-                  ? "Filled!"
-                  : "Failed to fill.";
+                response?.status === "filled" ? "Filled!" : "Failed to fill.";
             }
           );
         });
@@ -94,11 +90,12 @@ function loadAccountsForSite() {
   });
 }
 
-// View All Passwords Panel
 document.getElementById("viewAllBtn").addEventListener("click", () => {
   const panel = document.getElementById("allPasswordsPanel");
   panel.classList.toggle("hidden");
-  loadAllPasswords();
+  if (!panel.classList.contains("hidden")) {
+    loadAllPasswords();
+  }
 });
 
 function loadAllPasswords() {
@@ -121,47 +118,69 @@ function loadAllPasswords() {
       item.className = "account-item";
 
       const label = document.createElement("div");
-      label.textContent = `${entry.title} | ${entry.username}`;
+      label.textContent = `${entry.title || 'Untitled'} | ${entry.username}`;
       label.className = "account-label";
 
       const pwd = document.createElement("div");
       pwd.textContent = entry.password;
       pwd.className = "password-hidden";
 
-      const btn = document.createElement("button");
-      btn.textContent = "View";
-      btn.className = "view-btn";
+      const btnGroup = document.createElement("div");
 
-      btn.addEventListener("click", () => {
-        if (pwd.classList.contains("password-hidden")) {
-          pwd.classList.remove("password-hidden");
-          pwd.classList.add("password-visible");
-          btn.textContent = "Hide";
-        } else {
-          pwd.classList.remove("password-visible");
-          pwd.classList.add("password-hidden");
-          btn.textContent = "View";
-        }
+      const viewPassBtn = document.createElement("button");
+      viewPassBtn.textContent = "View Pass";
+      viewPassBtn.className = "view-btn";
+
+      viewPassBtn.addEventListener("click", () => {
+        const isHidden = pwd.classList.contains("password-hidden");
+        pwd.className = isHidden ? "password-visible" : "password-hidden";
+        viewPassBtn.textContent = isHidden ? "Hide Pass" : "View Pass";
       });
 
       item.appendChild(label);
       item.appendChild(pwd);
-      item.appendChild(btn);
+      btnGroup.appendChild(viewPassBtn);
+
+      // Handle Notes
+      if (entry.notes && entry.notes.trim() !== "") {
+        const notesDiv = document.createElement("div");
+        notesDiv.textContent = entry.notes;
+        notesDiv.className = "notes-container";
+
+        const viewNotesBtn = document.createElement("button");
+        viewNotesBtn.textContent = "View Notes";
+        viewNotesBtn.className = "view-notes-btn";
+
+        viewNotesBtn.addEventListener("click", () => {
+          const isVisible = notesDiv.classList.contains("visible");
+          if (isVisible) {
+            notesDiv.classList.remove("visible");
+            viewNotesBtn.textContent = "View Notes";
+          } else {
+            notesDiv.classList.add("visible");
+            viewNotesBtn.textContent = "Hide Notes";
+          }
+        });
+
+        btnGroup.appendChild(viewNotesBtn);
+        item.appendChild(btnGroup);
+        item.appendChild(notesDiv);
+      } else {
+        item.appendChild(btnGroup);
+      }
 
       list.appendChild(item);
     });
   });
 }
 
-// Search Filter
 document.getElementById("searchInput").addEventListener("input", (e) => {
   const term = e.target.value.toLowerCase();
   const items = document.querySelectorAll("#allPasswordsList .account-item");
 
   items.forEach(item => {
-    item.style.display = item.textContent.toLowerCase().includes(term)
-      ? "block"
-      : "none";
+    const text = item.querySelector('.account-label').textContent.toLowerCase();
+    item.style.display = text.includes(term) ? "block" : "none";
   });
 });
 
@@ -187,9 +206,7 @@ function checkMasterLock(reloaded = false) {
       return;
     }
 
-    // Use PIN instead of masterpassword
     const pin = data.pin;
-
     if (!pin) {
       lockScreen.classList.add("hidden");
       mainContent.classList.remove("hidden");
@@ -204,8 +221,7 @@ function checkMasterLock(reloaded = false) {
 
     document.getElementById("unlockBtn").onclick = () => {
       const input = document.getElementById("masterInput").value;
-
-      if (input === pin) {
+      if (input === pin.toString()) {
         document.getElementById("lockStatus").textContent = "";
         lockScreen.classList.add("hidden");
         mainContent.classList.remove("hidden");
@@ -217,10 +233,5 @@ function checkMasterLock(reloaded = false) {
   });
 }
 
-
-// Settings Version
-document.getElementById("version").textContent =
-  chrome.runtime.getManifest().version;
-
-// Start with master lock check
+document.getElementById("version").textContent = chrome.runtime.getManifest().version;
 checkMasterLock();
