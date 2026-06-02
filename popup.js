@@ -3,7 +3,7 @@ document.getElementById("chooseFileBtn").addEventListener("click", () => {
   document.getElementById("fileInput").click();
 });
 
-// Load PassPro File
+// Load PassPro File (.json and disguised .png support)
 document.getElementById("loadBtn").addEventListener("click", () => {
   const file = document.getElementById("fileInput").files[0];
   if (!file) {
@@ -11,15 +11,80 @@ document.getElementById("loadBtn").addEventListener("click", () => {
     return;
   }
 
-  const reader = new FileReader();
-  reader.onload = () => {
-    chrome.storage.local.set({ passproData: reader.result }, () => {
-      document.getElementById("status").textContent = "PassPro data loaded.";
+  const relockAndLoad = (jsonContent, message) => {
+    chrome.storage.local.set({ passproData: jsonContent }, () => {
+      document.getElementById("status").textContent = message || "PassPro data loaded.";
+      // Always relock on import for extra security
+      document.getElementById("masterInput").value = "";
+      document.getElementById("lockStatus").textContent = "";
+      document.getElementById("lockScreen").classList.remove("hidden");
+      document.getElementById("mainContent").classList.add("hidden");
       checkMasterLock(true);
     });
   };
 
-  reader.readAsText(file);
+  const reader = new FileReader();
+  const fileName = file.name.toLowerCase();
+
+  // Handle .png disguised PassPro files (base64 encoded JSON inside PNG comment or whole PNG is base64 json)
+  if (fileName.endsWith(".png")) {
+    reader.onload = () => {
+      const buffer = new Uint8Array(reader.result);
+      const textDecoder = new TextDecoder();
+      const asString = textDecoder.decode(buffer);
+
+      let base64Json = null;
+      let jsonContent = null;
+
+      const passproMarker = 'passpro:';
+      const markerIndex = asString.indexOf(passproMarker);
+      if (markerIndex !== -1) {
+        base64Json = asString.substring(markerIndex + passproMarker.length).trim();
+      } else {
+        const dataPrefix = 'data:application/json;base64,';
+        const dataIdx = asString.indexOf(dataPrefix);
+        if (dataIdx !== -1) {
+          base64Json = asString.substring(dataIdx + dataPrefix.length).replace(/[^A-Za-z0-9+/=]+/g, '');
+        }
+      }
+      if (!base64Json) {
+        const jsonStart = asString.indexOf('{');
+        if (jsonStart !== -1) {
+          base64Json = null;
+          jsonContent = asString.substring(jsonStart);
+        }
+      } else {
+        try {
+          jsonContent = atob(base64Json);
+        } catch {
+          jsonContent = null;
+        }
+      }
+
+      try {
+        if (jsonContent) {
+          JSON.parse(jsonContent); // Validate
+          relockAndLoad(jsonContent, "PassPro data loaded. Please unlock to access.");
+        } else {
+          throw new Error("No valid PassPro data found in PNG.");
+        }
+      } catch {
+        document.getElementById("status").textContent = "Invalid PassPro .png file.";
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  } else {
+    // Normal JSON flow
+    reader.onload = () => {
+      try {
+        JSON.parse(reader.result); // Validate
+        relockAndLoad(reader.result, "PassPro data loaded. Please unlock to access.");
+      } catch {
+        document.getElementById("status").textContent = "Invalid PassPro file.";
+      }
+    };
+    reader.readAsText(file);
+  }
 });
 
 function getDomain(url) {
@@ -214,6 +279,7 @@ function checkMasterLock(reloaded = false) {
       return;
     }
 
+    // Always show the lock screen after import or as needed
     if (!reloaded) {
       lockScreen.classList.remove("hidden");
       mainContent.classList.add("hidden");
@@ -230,6 +296,22 @@ function checkMasterLock(reloaded = false) {
         document.getElementById("lockStatus").textContent = "Incorrect PIN.";
       }
     };
+
+    // Add forgot pin link if not already present
+    let forgotPinLink = document.getElementById("forgotPinLink");
+    if (!forgotPinLink) {
+      forgotPinLink = document.createElement("a");
+      forgotPinLink.id = "forgotPinLink";
+      forgotPinLink.href = "https://stadiastudios.github.io/passpro/pages/help.html#forgot-pin";
+      forgotPinLink.target = "_blank";
+      forgotPinLink.textContent = "Forgot your PIN?";
+      forgotPinLink.style.display = "block";
+      forgotPinLink.style.marginTop = "10px";
+      forgotPinLink.style.textAlign = "center";
+      forgotPinLink.style.color = "white";
+      const lockScreenDiv = document.getElementById("lockScreen");
+      lockScreenDiv.appendChild(forgotPinLink);
+    }
   });
 }
 
